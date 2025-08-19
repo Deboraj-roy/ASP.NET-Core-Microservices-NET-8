@@ -77,7 +77,8 @@ namespace Mango.Services.AuthAPI.Service
                 Email = model.Email,
                 NormalizedEmail = model.Email.ToUpper(),
                 Name = model.Name,
-                PhoneNumber = model.PhoneNumber
+                PhoneNumber = model.PhoneNumber,
+                CreatedDate = DateTime.Now
             };
 
             try
