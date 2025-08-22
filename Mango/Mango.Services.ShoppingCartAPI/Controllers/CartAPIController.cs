@@ -2,6 +2,7 @@
 using Mango.Services.ShoppingCartAPI.Data;
 using Mango.Services.ShoppingCartAPI.Models;
 using Mango.Services.ShoppingCartAPI.Models.Dto;
+using Mango.Services.ShoppingCartAPI.Service.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +17,13 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
         private ResponseDto _response;
         private IMapper _mapper;
         private readonly AppDbContext _db;
-        public CartAPIController(AppDbContext db, IMapper mapper)
+        private readonly IProductService _productService;
+        public CartAPIController(AppDbContext db, IMapper mapper, IProductService productService)
         {
             this._db = db;
             this._mapper = mapper;
             this._response = new ResponseDto();
+            this._productService = productService ?? throw new ArgumentNullException(nameof(productService));
         }
 
         [HttpGet("GetCart/{userId}")]
@@ -36,9 +39,15 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
                     var details = _db.CartDetails.Where(u => u.CartHeaderId == cart.CartHeader.CartHeaderId);
 
                     cart.CartDetails = _mapper.Map<IEnumerable<CartDetailsDto>>(details);
+                    
+                    //var productDtos = await _productService.GetProductsAsync();
+
 
                     foreach (var item in cart.CartDetails)
                     {
+                        //item.Product = productDtos.FirstOrDefault(u => u.ProductId == item.ProductId);
+                        item.Product = await _productService.GetProductByIdAsync(item.ProductId);
+
                         cart.CartHeader.CartTotal += (item.Count * item.Product.Price);
                     }
 
