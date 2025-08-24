@@ -1,4 +1,4 @@
-﻿namespace Mango.Web.Utility
+﻿namespace Mango.Services.ShoppingCartAPI.Utility
 {
     public class SD
     {

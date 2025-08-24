@@ -3,6 +3,7 @@ using Mango.Services.ShoppingCartAPI.Data;
 using Mango.Services.ShoppingCartAPI.Models;
 using Mango.Services.ShoppingCartAPI.Models.Dto;
 using Mango.Services.ShoppingCartAPI.Service.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
     //[Route("api/[controller]")]
     [Route("api/cart")]
     [ApiController]
+    [Authorize]
     public class CartAPIController : ControllerBase
     {
         private ResponseDto _response;
@@ -53,18 +55,19 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
                         cart.CartHeader.CartTotal += (item.Count * item.Product.Price);
                     }
 
+                    //apply coupon if any
+                    if (!string.IsNullOrWhiteSpace(cart.CartHeader.CouponCode))
+                    {
+                        CouponDto coupon = await _couponService.GetCouponAsync(cart.CartHeader.CouponCode);
+                        if (coupon != null && cart.CartHeader.CartTotal > coupon.MinAmount)
+                        {
+                            cart.CartHeader.CartTotal -= coupon.DiscountAmount;
+                            cart.CartHeader.Discount = coupon.DiscountAmount;
+                        }
+                    }
+
                 }
 
-                //apply coupon if any
-                if (!string.IsNullOrWhiteSpace(cart.CartHeader.CouponCode))
-                {
-                    CouponDto coupon = await _couponService.GetCouponAsync(cart.CartHeader.CouponCode);
-                    if (coupon != null && cart.CartHeader.CartTotal > coupon.MinAmount)
-                    {
-                        cart.CartHeader.CartTotal -= coupon.DiscountAmount;
-                        cart.CartHeader.Discount = coupon.DiscountAmount;
-                    }
-                }
 
                 _response.Result = cart;
             }
