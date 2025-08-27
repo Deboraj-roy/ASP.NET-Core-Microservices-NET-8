@@ -34,7 +34,8 @@ namespace Mango.Services.EmailAPI.Services
             message.Append("</ul>");
 
             await LogAndEmail(message.ToString(), cartDto.CartHeader.Email);
-            SendEmail(await Task.FromResult(cartDto.CartHeader.Email), "Cart Email", message.ToString());
+            //SendEmail(await Task.FromResult(cartDto.CartHeader.Email), "Cart Email", message.ToString());
+
         }
 
         private async Task<bool> LogAndEmail(string message, string email)
@@ -50,6 +51,9 @@ namespace Mango.Services.EmailAPI.Services
                 await using var _db = new AppDbContext(_dbOptions);
                 await _db.EmailLoggers.AddAsync(emailLog);
                 await _db.SaveChangesAsync();
+
+                await SendEmail(email, "Email log", message.ToString());
+
                 return true;
             }
             catch (Exception ex)
