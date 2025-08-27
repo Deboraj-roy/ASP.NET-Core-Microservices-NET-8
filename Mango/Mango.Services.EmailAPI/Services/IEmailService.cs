@@ -6,5 +6,6 @@ namespace Mango.Services.EmailAPI.Services
     {
         Task EmailCartAndLog(CartDto cartDto);
         Task RegisterUserEmailAndLog(string email);
+        Task<bool> SendEmail(string ToEmail, string subject, string body);
     }
 }
