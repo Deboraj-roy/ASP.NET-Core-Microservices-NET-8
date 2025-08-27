@@ -1,0 +1,102 @@
+﻿using Mango.Services.ShoppingCartAPI.Service.IService;
+using Microsoft.Extensions.Configuration;
+using System.Net;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
+
+namespace Mango.Services.ShoppingCartAPI.Service
+{
+    public class SendEmailService : ISendEmailService
+    {
+        private readonly string Host;
+        private readonly int Port;
+        private readonly string Username;
+        private readonly string Password;
+        private readonly string FromEmail;
+        private readonly string FromName;
+
+        public SendEmailService(IConfiguration config)
+        {
+            this.Host = config["Mailtrap:Host"] ?? throw new ArgumentNullException("Mailtrap:Host");
+            this.Port = int.TryParse(config["Mailtrap:Port"], out var p) ? p : 2525;
+            this.Username = config["Mailtrap:Username"] ?? throw new ArgumentNullException("Mailtrap:Username");
+            this.Password = config["Mailtrap:Password"] ?? throw new ArgumentNullException("Mailtrap:Password");
+            this.FromEmail = config["Mailtrap:FromEmail"] ?? throw new ArgumentNullException("Mailtrap:FromEmail");
+            this.FromName = config["Mailtrap:FromName"] ?? "No Name";
+        }
+
+        public async Task<bool> SendAsync(string toEmail, string subject, string body)
+        {
+            try
+            {
+
+                ///Send Raw Html Body...
+                //using var client = new SmtpClient(Host, Port)
+                //{
+                //    Credentials = new NetworkCredential(Username, Password),
+                //    EnableSsl = true
+                //};
+
+                //var message = new MailMessage
+                //{
+                //    From = new MailAddress(FromEmail, FromName),
+                //    Subject = subject,
+                //    Body = body,
+                //    IsBodyHtml = false
+                //};
+                //message.To.Add(new MailAddress(toEmail));
+
+                //await client.SendMailAsync(message);
+
+                ///A decent Body
+                ///
+                var message = new MailMessage()
+                {
+                    From = new MailAddress(FromEmail),
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = true
+                };
+
+                if (string.IsNullOrEmpty(toEmail))
+                {
+                    //throw new ArgumentNullException(nameof(toEmail));
+                }
+
+                //define a regex pattern for email validation
+                string pattern = @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$";
+                Regex regex = new Regex(pattern);
+
+                // return true if email is valid pattern
+                var result = regex.IsMatch(toEmail);
+
+                if (result)
+                {
+                    message.To.Add(toEmail);
+
+                    var smtpClient = new SmtpClient(Host)
+                    {
+                        Port = Convert.ToInt32(Port),
+                        Credentials = new NetworkCredential(Username, Password),
+                        EnableSsl = true
+                    };
+
+                    await smtpClient.SendMailAsync(message);
+                    smtpClient.Dispose();
+                }
+                
+
+                //Console.WriteLine("Email sent successfully.");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine($"Mailtrap send error: {ex.Message}");
+                return false;
+            }
+        }
+    }
+
+}
+

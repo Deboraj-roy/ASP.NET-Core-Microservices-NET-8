@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace Mango.Services.ShoppingCartAPI.Controllers
 {
@@ -24,9 +25,11 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
         private readonly ICouponService _couponService;
         private IConfiguration _configuration;
         private readonly IMessageBus _messageBus;
+        private readonly ISendEmailService _emailService;
+
 
         public CartAPIController(AppDbContext db, IMapper mapper, IProductService productService,
-            ICouponService couponService, IConfiguration configuration, IMessageBus messageBus)
+            ICouponService couponService, IConfiguration configuration, IMessageBus messageBus, ISendEmailService emailService)
         {
             this._db = db;
             this._mapper = mapper;
@@ -35,6 +38,7 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
             this._couponService = couponService;
             this._configuration = configuration;
             this._messageBus = messageBus;
+            this._emailService = emailService;
         }
 
         [HttpGet("GetCart/{userId}")]
@@ -215,6 +219,7 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
             {
                 var queueName = _configuration.GetValue<string>("TopicAndQueueNames:EmailShoppingCartQueue") ?? "emailshoppingcart";
                 await _messageBus.PublishMessage(cartDto, queueName);
+                await _emailService.SendAsync(cartDto.CartHeader.Email, "Your Mango Cart Summary", MailBody(cartDto));
                 _response.Result = true;
             }
             catch (Exception ex)
@@ -225,5 +230,30 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
             return _response;
         }
 
+        private string MailBody(CartDto cartDto)
+        {
+            var message = new StringBuilder();
+            message.Append("<html><body style='font-family: Arial, sans-serif; font-size:14px;'>");
+            message.Append("<h2>Cart Email Requested</h2>");
+            message.Append($"<p><strong>Total:</strong> {cartDto.CartHeader.CartTotal:C}</p>");
+            message.Append("<hr/>");
+            message.Append("<h3>Items in Your Cart:</h3>");
+            message.Append("<ul style='list-style-type: none; padding: 0;'>");
+
+            foreach (var item in cartDto.CartDetails)
+            {
+                message.Append("<li style='margin-bottom: 8px;'>");
+                message.Append($"{item.Product.Name} <strong>x {item.Count}</strong>");
+                message.Append("</li>");
+            }
+
+            message.Append("</ul>");
+            message.Append("<p>Thank you for shopping with Mango!</p>");
+            message.Append("</body></html>");
+
+            return message.ToString();
+        }
+
     }
+
 }
