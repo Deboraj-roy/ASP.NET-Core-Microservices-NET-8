@@ -19,7 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
+ 
 
 builder.Services.AddHttpContextAccessor();
 // this will handle the token and add it to the request header
