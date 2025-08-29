@@ -217,9 +217,10 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
         {
             try
             {
+                await _emailService.SendAsync(cartDto.CartHeader.Email, "Your Mango Cart Summary", MailBody(cartDto));
+
                 var queueName = _configuration.GetValue<string>("TopicAndQueueNames:EmailShoppingCartQueue") ?? "emailshoppingcart";
                 await _messageBus.PublishMessage(cartDto, queueName);
-                await _emailService.SendAsync(cartDto.CartHeader.Email, "Your Mango Cart Summary", MailBody(cartDto));
                 _response.Result = true;
             }
             catch (Exception ex)

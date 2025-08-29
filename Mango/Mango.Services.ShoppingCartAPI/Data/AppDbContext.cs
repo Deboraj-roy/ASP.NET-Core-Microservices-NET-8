@@ -11,6 +11,7 @@ namespace Mango.Services.ShoppingCartAPI.Data
 
         public DbSet<CartHeader> CartHeaders { get; set; }
         public DbSet<CartDetails> CartDetails { get; set; }
+        public DbSet<CartEmailLogger> CartEmailLoggers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
