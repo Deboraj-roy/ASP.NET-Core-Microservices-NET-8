@@ -1,7 +1,12 @@
-﻿using Mango.Services.ShoppingCartAPI.Service.IService;
+﻿using Mango.Services.ShoppingCartAPI.Data;
+using Mango.Services.ShoppingCartAPI.Models;
+using Mango.Services.ShoppingCartAPI.Models.Dto;
+using Mango.Services.ShoppingCartAPI.Service.IService;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Mango.Services.ShoppingCartAPI.Service
@@ -14,8 +19,10 @@ namespace Mango.Services.ShoppingCartAPI.Service
         private readonly string Password;
         private readonly string FromEmail;
         private readonly string FromName;
+        private readonly AppDbContext _db;
 
-        public SendEmailService(IConfiguration config)
+
+        public SendEmailService(IConfiguration config, AppDbContext db)
         {
             this.Host = config["Mailtrap:Host"] ?? throw new ArgumentNullException("Mailtrap:Host");
             this.Port = int.TryParse(config["Mailtrap:Port"], out var p) ? p : 2525;
@@ -23,12 +30,15 @@ namespace Mango.Services.ShoppingCartAPI.Service
             this.Password = config["Mailtrap:Password"] ?? throw new ArgumentNullException("Mailtrap:Password");
             this.FromEmail = config["Mailtrap:FromEmail"] ?? throw new ArgumentNullException("Mailtrap:FromEmail");
             this.FromName = config["Mailtrap:FromName"] ?? "No Name";
+            this._db = db ?? throw new ArgumentNullException(nameof(db));
         }
 
         public async Task<bool> SendAsync(string toEmail, string subject, string body)
         {
             try
             {
+
+                await LogCardEmailAsync(toEmail, subject, body);
 
                 ///Send Raw Html Body...
                 //using var client = new SmtpClient(Host, Port)
@@ -84,7 +94,7 @@ namespace Mango.Services.ShoppingCartAPI.Service
                     await smtpClient.SendMailAsync(message);
                     smtpClient.Dispose();
                 }
-                
+
 
                 //Console.WriteLine("Email sent successfully.");
 
@@ -95,7 +105,31 @@ namespace Mango.Services.ShoppingCartAPI.Service
                 //Console.WriteLine($"Mailtrap send error: {ex.Message}");
                 return false;
             }
+        } 
+
+
+        private async Task<bool> LogCardEmailAsync(string toEmail, string subject, string body)
+        {
+            try
+            {
+                CartEmailLogger emailLog = new()
+                {
+                    Email = toEmail,
+                    Subject = subject,
+                    Message = body,
+                    EmailSent = DateTime.Now,
+                }; 
+                await _db.CartEmailLoggers.AddAsync(emailLog);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
+
+
     }
 
 }
