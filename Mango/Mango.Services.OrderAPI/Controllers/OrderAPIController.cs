@@ -43,8 +43,11 @@ namespace Mango.Services.OrderAPI.Controllers
 
                 //OrderHeader orderCreated = await _db.OrderHeaders.AddAsync(_mapper.Map<OrderHeader>(orderHeaderDto)).Entity;
 
-                OrderHeader orderCreated = _mapper.Map<OrderHeader>(orderHeaderDto);
-                await _db.OrderHeaders.AddAsync(orderCreated);
+                //OrderHeader orderCreated = _mapper.Map<OrderHeader>(orderHeaderDto);
+                //await _db.OrderHeaders.AddAsync(orderCreated);
+
+                OrderHeader orderCreated = _db.OrderHeaders.Add(_mapper.Map<OrderHeader>(orderHeaderDto)).Entity;
+
                 await _db.SaveChangesAsync();
 
                 orderHeaderDto.OrderHeaderId = orderCreated.OrderHeaderId;
