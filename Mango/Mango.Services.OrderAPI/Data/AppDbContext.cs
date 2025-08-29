@@ -1,7 +1,7 @@
-﻿using Mango.Services.ShoppingCartAPI.Models;
+﻿using Mango.Services.OrderAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Mango.Services.ShoppingCartAPI.Data
+namespace Mango.Services.OrderAPI.Data
 {
     public class AppDbContext : DbContext
     {
@@ -9,9 +9,8 @@ namespace Mango.Services.ShoppingCartAPI.Data
         {
         }
 
-        public DbSet<CartHeader> CartHeaders { get; set; }
-        public DbSet<CartDetails> CartDetails { get; set; }
-        public DbSet<CartEmailLogger> CartEmailLoggers { get; set; }
+        public DbSet<OrderHeader> OrderHeaders { get; set; }
+        public DbSet<OrderDetails> OrderDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
