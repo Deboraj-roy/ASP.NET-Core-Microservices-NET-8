@@ -4,6 +4,7 @@ using Mango.Web.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Mango.Web.Controllers
@@ -22,7 +23,7 @@ namespace Mango.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll(string status)
         {
             IEnumerable<OrderHeaderDto> result;
             string userId = "";
@@ -34,6 +35,21 @@ namespace Mango.Web.Controllers
             if (response != null && response.IsSuccess)
             {
                 result = JsonConvert.DeserializeObject<List<OrderHeaderDto>>(Convert.ToString(response.Result));
+
+                switch (status)
+                {
+                    case "approved":
+                        result = result.Where(u => u.Status == SD.Status_Approved);
+                        break;
+                    case "readyforpickup":
+                        result = result.Where(u => u.Status == SD.Status_ReadyForPickup);
+                        break;
+                    case "cancelled":
+                        result = result.Where(u => u.Status == SD.Status_Cancelled || u.Status == SD.Status_Refunded);
+                        break;
+                    default:
+                        break;
+                }
             }
             else
             {
