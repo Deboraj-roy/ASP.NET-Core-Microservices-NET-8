@@ -10,5 +10,7 @@
         public string CategoryName { get; set; }
         public string ImageUrl { get; set; }
         public int Count { get; set; } = 1;
+        public string? ImageLocalPath { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }

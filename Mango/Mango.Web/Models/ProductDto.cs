@@ -13,5 +13,7 @@ namespace Mango.Web.Models
         public string ImageUrl { get; set; }
         [Range(1, 100, ErrorMessage = "Please enter a valid count between 1 and 100.")]
         public int Count { get; set; } = 1;
+        public string? ImageLocalPath { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }
