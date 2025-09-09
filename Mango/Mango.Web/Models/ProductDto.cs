@@ -10,7 +10,7 @@ namespace Mango.Web.Models
         public double Price { get; set; }
         public string Description { get; set; }
         public string CategoryName { get; set; }
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
         [Range(1, 100, ErrorMessage = "Please enter a valid count between 1 and 100.")]
         public int Count { get; set; } = 1;
         public string? ImageLocalPath { get; set; }

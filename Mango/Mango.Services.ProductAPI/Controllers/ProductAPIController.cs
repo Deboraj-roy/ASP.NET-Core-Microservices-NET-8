@@ -59,12 +59,14 @@ namespace Mango.Services.ProductAPI.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public ResponseDto Post([FromBody] ProductDto ProductDto)
+        //public ResponseDto Post([FromBody] ProductDto ProductDto)
+        public ResponseDto Post(ProductDto ProductDto)
         {
             try
             {
                 Product product = _mapper.Map<Product>(ProductDto);
                 _db.Products.Add(product);
+                product.ImageUrl = product.ImageUrl ?? "";
                 _db.SaveChanges();
 
                 if (ProductDto.Image != null)
