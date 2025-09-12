@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System.IO;
 using Mango.Services.ProductAPI.Models.Dto;
 using Mango.Services.ProductAPI.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -134,6 +135,19 @@ namespace Mango.Services.ProductAPI.Controllers
             try
             {
                 Product obj = _db.Products.First(u => u.ProductId == id);
+
+                if (!string.IsNullOrWhiteSpace(obj.ImageLocalPath))
+                {
+                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), obj.ImageLocalPath);
+
+                    FileInfo oldImage = new FileInfo(oldImagePath);
+
+                    if (oldImage.Exists)
+                    {
+                        oldImage.Delete();
+                    }
+                }
+
                 _db.Products.Remove(obj);
                 _db.SaveChanges();
             }
