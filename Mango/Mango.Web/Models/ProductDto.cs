@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Mango.Web.Utility;
+using System.ComponentModel.DataAnnotations;
 
 namespace Mango.Web.Models
 {
@@ -14,6 +15,8 @@ namespace Mango.Web.Models
         [Range(1, 100, ErrorMessage = "Please enter a valid count between 1 and 100.")]
         public int Count { get; set; } = 1;
         public string? ImageLocalPath { get; set; }
+        [MaxFileSize(1)]
+        [AllowedExtensions(new string[] { ".jpg", ".png" })]
         public IFormFile? Image { get; set; }
     }
 }

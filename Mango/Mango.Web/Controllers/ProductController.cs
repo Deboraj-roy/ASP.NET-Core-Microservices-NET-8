@@ -79,16 +79,19 @@ namespace Mango.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ProductDelete(ProductDto productDto)
         {
-            ResponseDto? response = await _productService.DeleteProductsAsync(productDto.ProductId);
+            if (ModelState.IsValid)
+            {
+                ResponseDto? response = await _productService.DeleteProductsAsync(productDto.ProductId);
 
-            if (response != null && response.IsSuccess)
-            {
-                TempData["success"] = "Product deleted successfully";
-                return RedirectToAction(nameof(ProductIndex));
-            }
-            else
-            {
-                TempData["error"] = response?.Message;
+                if (response != null && response.IsSuccess)
+                {
+                    TempData["success"] = "Product deleted successfully";
+                    return RedirectToAction(nameof(ProductIndex));
+                }
+                else
+                {
+                    TempData["error"] = response?.Message;
+                }
             }
             return View(productDto);
         }
