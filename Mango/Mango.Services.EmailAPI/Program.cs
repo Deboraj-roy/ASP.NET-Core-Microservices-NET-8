@@ -37,7 +37,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "AUTH API");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Email API");
     c.RoutePrefix = string.Empty;
 });
 
