@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json.schemastore.org/task.json",
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dotnet restore (solution)",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["restore", "Mango/Mango.sln"],
+      "group": "build",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "dotnet build (Debug)",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "Mango/Mango.sln",
+        "-c",
+        "Debug"
+      ],
+      "group": "build",
+      "dependsOn": ["dotnet restore (solution)"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "dotnet build (Release)",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "Mango/Mango.sln",
+        "-c",
+        "Release"
+      ],
+      "group": "build",
+      "dependsOn": ["dotnet restore (solution)"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "dotnet test",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["test", "Mango/Mango.sln"],
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
