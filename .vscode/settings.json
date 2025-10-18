@@ -1,0 +1,19 @@
+{
+  "dotnet.defaultSolution": "Mango/Mango.sln",
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "**/node_modules": true
+  },
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true
+  },
+  "csharp.suppressBuildAssetsEvaluation": true,
+  "csharp.inlayHints.parameters.enabled": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "dotnet.server.useOmnisharp": false
+}

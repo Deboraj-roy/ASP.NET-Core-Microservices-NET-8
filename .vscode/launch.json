@@ -1,0 +1,175 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Launch Mango.Web",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet build (Debug)",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "Mango/Mango.Web/Mango.Web.csproj",
+        "--no-build"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": { "ASPNETCORE_ENVIRONMENT": "Development" },
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": ".NET Launch Mango.GatewaySolution",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet build (Debug)",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "Mango/Mango.GatewaySolution/Mango.GatewaySolution.csproj",
+        "--no-build"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": { "ASPNETCORE_ENVIRONMENT": "Development" },
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": ".NET Launch Mango.Services.AuthAPI",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet build (Debug)",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "Mango/Mango.Services.AuthAPI/Mango.Services.AuthAPI.csproj",
+        "--no-build"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": { "ASPNETCORE_ENVIRONMENT": "Development" },
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": ".NET Launch Mango.Services.CouponAPI",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet build (Debug)",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "Mango/Mango.Services.CouponAPI/Mango.Services.CouponAPI.csproj",
+        "--no-build"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": { "ASPNETCORE_ENVIRONMENT": "Development" },
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": ".NET Launch Mango.Services.ProductAPI",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet build (Debug)",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "Mango/Mango.Services.ProductAPI/Mango.Services.ProductAPI.csproj",
+        "--no-build"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": { "ASPNETCORE_ENVIRONMENT": "Development" },
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": ".NET Launch Mango.Services.EmailAPI",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet build (Debug)",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "Mango/Mango.Services.EmailAPI/Mango.Services.EmailAPI.csproj",
+        "--no-build"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": { "ASPNETCORE_ENVIRONMENT": "Development" },
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": ".NET Launch Mango.Services.ShoppingCartAPI",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet build (Debug)",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "Mango/Mango.Services.ShoppingCartAPI/Mango.Services.ShoppingCartAPI.csproj",
+        "--no-build"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": { "ASPNETCORE_ENVIRONMENT": "Development" },
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": ".NET Launch Mango.Services.OrderAPI",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet build (Debug)",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "Mango/Mango.Services.OrderAPI/Mango.Services.OrderAPI.csproj",
+        "--no-build"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": { "ASPNETCORE_ENVIRONMENT": "Development" },
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": ".NET Launch Mango.Services.RewardAPI",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet build (Debug)",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "Mango/Mango.Services.RewardAPI/Mango.Services.RewardAPI.csproj",
+        "--no-build"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": { "ASPNETCORE_ENVIRONMENT": "Development" },
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Run Web + Gateway + APIs",
+      "configurations": [
+        ".NET Launch Mango.Web",
+        ".NET Launch Mango.GatewaySolution",
+        ".NET Launch Mango.Services.AuthAPI",
+        ".NET Launch Mango.Services.CouponAPI",
+        ".NET Launch Mango.Services.ProductAPI",
+        ".NET Launch Mango.Services.EmailAPI",
+        ".NET Launch Mango.Services.ShoppingCartAPI",
+        ".NET Launch Mango.Services.OrderAPI",
+        ".NET Launch Mango.Services.RewardAPI"
+      ],
+      "stopAll": true
+    }
+  ]
+}
