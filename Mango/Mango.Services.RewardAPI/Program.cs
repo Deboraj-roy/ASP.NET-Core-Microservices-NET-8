@@ -39,8 +39,13 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Reward API");
-    c.RoutePrefix = string.Empty;
+    //c.SwaggerEndpoint("/swagger/v1/swagger.json", "Reward API");
+    //c.RoutePrefix = string.Empty;
+    if (!app.Environment.IsDevelopment())
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Reward API");
+        c.RoutePrefix = string.Empty;
+    }
 });
 
 

@@ -55,7 +55,7 @@ namespace Mango.Services.OrderAPI.Controllers
 
                 //OrderHeader orderCreated = _mapper.Map<OrderHeader>(orderHeaderDto);
                 //await _db.OrderHeaders.AddAsync(orderCreated);
-
+                orderHeaderDto.OrderTotal = Math.Round(orderHeaderDto.OrderTotal, 2);
                 OrderHeader orderCreated = _db.OrderHeaders.Add(_mapper.Map<OrderHeader>(orderHeaderDto)).Entity;
 
                 await _db.SaveChangesAsync();
