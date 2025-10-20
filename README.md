@@ -11,8 +11,14 @@ Course / Resources
 - Original instructor / project hub: https://dotnetmastery.com/ and https://github.com/bhrugen
 
 Certificate
-- Udemy Certificate: https://www.udemy.com/certificate/UC-29f57052-58d3-4534-ab25-d45dfd4bd558/  
-  (This verifies that DEBORAJ ROY completed the course on 2025-10-18.)
+- Udemy Certificate: https://www.udemy.com/certificate/UC-29f57052-58d3-4534-ab25-d45dfd4bd558/ 
+<hr>
+<!-- 
+![UC-29f57052-58d3-4534-ab25-d45dfd4bd558](https://udemy-certificate.s3.amazonaws.com/image/UC-29f57052-58d3-4534-ab25-d45dfd4bd558.jpg) -->
+
+![UC-29f57052-58d3-4534-ab25-d45dfd4bd558](https://github.com/user-attachments/assets/5eed4673-39a5-4a32-83f1-4b3f856ea3c6)
+
+<br>
 
 Table of contents
 - Project vision
