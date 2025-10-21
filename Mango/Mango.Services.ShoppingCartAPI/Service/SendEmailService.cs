@@ -3,6 +3,7 @@ using Mango.Services.ShoppingCartAPI.Models;
 using Mango.Services.ShoppingCartAPI.Models.Dto;
 using Mango.Services.ShoppingCartAPI.Service.IService;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
@@ -24,13 +25,30 @@ namespace Mango.Services.ShoppingCartAPI.Service
 
         public SendEmailService(IConfiguration config, AppDbContext db)
         {
-            this.Host = config["Mailtrap:Host"] ?? throw new ArgumentNullException("Mailtrap:Host");
-            this.Port = int.TryParse(config["Mailtrap:Port"], out var p) ? p : 2525;
-            this.Username = config["Mailtrap:Username"] ?? throw new ArgumentNullException("Mailtrap:Username");
-            this.Password = config["Mailtrap:Password"] ?? throw new ArgumentNullException("Mailtrap:Password");
-            this.FromEmail = config["Mailtrap:FromEmail"] ?? throw new ArgumentNullException("Mailtrap:FromEmail");
-            this.FromName = config["Mailtrap:FromName"] ?? "No Name";
             this._db = db ?? throw new ArgumentNullException(nameof(db));
+            var mailConfig = _db.MailConfigurations
+                                    .AsNoTracking()
+                                    .Where(s => s.IsActive == true)
+                                    .FirstOrDefault();
+            if (mailConfig != null)
+            {
+                this.Host = mailConfig.Host;
+                this.Port = mailConfig.Port;
+                this.Username = mailConfig.Username;
+                this.Password = mailConfig.Password;
+                this.FromEmail = mailConfig.FromEmail;
+                this.FromName = mailConfig.FromName;
+            }
+            else
+            {
+                this.Host = config["Mailtrap:Host"] ?? throw new ArgumentNullException("Mailtrap:Host");
+                this.Port = int.TryParse(config["Mailtrap:Port"], out var p) ? p : 2525;
+                this.Username = config["Mailtrap:Username"] ?? throw new ArgumentNullException("Mailtrap:Username");
+                this.Password = config["Mailtrap:Password"] ?? throw new ArgumentNullException("Mailtrap:Password");
+                this.FromEmail = config["Mailtrap:FromEmail"] ?? throw new ArgumentNullException("Mailtrap:FromEmail");
+                this.FromName = config["Mailtrap:FromName"] ?? "No Name";
+            }
+
         }
 
         public async Task<bool> SendAsync(string toEmail, string subject, string body)
@@ -105,7 +123,7 @@ namespace Mango.Services.ShoppingCartAPI.Service
                 //Console.WriteLine($"Mailtrap send error: {ex.Message}");
                 return false;
             }
-        } 
+        }
 
 
         private async Task<bool> LogCardEmailAsync(string toEmail, string subject, string body)
@@ -118,7 +136,7 @@ namespace Mango.Services.ShoppingCartAPI.Service
                     Subject = subject,
                     Message = body,
                     EmailSent = DateTime.Now,
-                }; 
+                };
                 await _db.CartEmailLoggers.AddAsync(emailLog);
                 await _db.SaveChangesAsync();
                 return true;
