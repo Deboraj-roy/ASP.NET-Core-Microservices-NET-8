@@ -31,7 +31,6 @@ namespace Mango.Services.ShoppingCartAPI.RabbitMQSender
 
             if (await ConnctionExists())
             {
-                using var channel = await this._connection.CreateChannelAsync();
                 await channel.QueueDeclareAsync(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
 
                 var json = JsonConvert.SerializeObject(message);
@@ -41,7 +40,6 @@ namespace Mango.Services.ShoppingCartAPI.RabbitMQSender
             }
         }
 
-        private async Task CreateConnection()
         {
             try
             {
@@ -51,7 +49,6 @@ namespace Mango.Services.ShoppingCartAPI.RabbitMQSender
                     UserName = this._username,
                     Password = this._password
                 };
-                this._connection = await factory.CreateConnectionAsync();
             }
             catch (Exception ex)
             {
@@ -60,13 +57,11 @@ namespace Mango.Services.ShoppingCartAPI.RabbitMQSender
             }
         }
 
-        private async Task<bool> ConnctionExists()
         {
             if (this._connection != null)
             {
                 return true;
             }
-            await CreateConnection();
             return true;
         }
     }
