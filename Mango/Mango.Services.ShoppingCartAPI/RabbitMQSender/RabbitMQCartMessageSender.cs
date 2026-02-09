@@ -3,16 +3,16 @@ using System.Text;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 
-namespace Mango.Services.AuthAPI.RabbitMQSender
+namespace Mango.Services.ShoppingCartAPI.RabbitMQSender
 {
-    public class RabbitMQAuthMessageSender : IRabbitMQAuthMessageSender
+    public class RabbitMQCartMessageSender : IRabbitMQCartMessageSender
     {
         private readonly string _hostName;
         private readonly string _username;
         private readonly string _password;
         private IConnection? _connection; // Make _connection nullable to fix CS8618
 
-        public RabbitMQAuthMessageSender()
+        public RabbitMQCartMessageSender()
         {
             this._hostName = "localhost";
             this._username = "guest";
@@ -26,14 +26,14 @@ namespace Mango.Services.AuthAPI.RabbitMQSender
             //    UserName = _username,
             //    Password = _password
             //};
-
             //this._connection = await factory.CreateConnectionAsync();
+
 
             if (await ConnctionExists())
             {
-                using var channel = await _connection.CreateChannelAsync();
+                using var channel = await this._connection.CreateChannelAsync();
                 await channel.QueueDeclareAsync(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
-                
+
                 var json = JsonConvert.SerializeObject(message);
                 var body = Encoding.UTF8.GetBytes(json);
                 //await channel.BasicPublishAsync(exchange: "", routingKey: queueName, basicProperties: null, body: body);
@@ -62,11 +62,11 @@ namespace Mango.Services.AuthAPI.RabbitMQSender
 
         private async Task<bool> ConnctionExists()
         {
-            if (this._connection == null)
+            if (this._connection != null)
             {
-                await CreateConnection();
                 return true;
             }
+            await CreateConnection();
             return true;
         }
     }

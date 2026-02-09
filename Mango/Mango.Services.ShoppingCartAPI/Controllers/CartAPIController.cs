@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using Mango.Services.ShoppingCartAPI.RabbitMQSender;
 
 namespace Mango.Services.ShoppingCartAPI.Controllers
 {
@@ -24,12 +25,13 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
         private readonly IProductService _productService;
         private readonly ICouponService _couponService;
         private IConfiguration _configuration;
-        private readonly IMessageBus _messageBus;
+        //private readonly IMessageBus _messageBus;
+        private readonly IRabbitMQCartMessageSender _messageBus;
         private readonly ISendEmailService _emailService;
 
 
         public CartAPIController(AppDbContext db, IMapper mapper, IProductService productService,
-            ICouponService couponService, IConfiguration configuration, IMessageBus messageBus, ISendEmailService emailService)
+            ICouponService couponService, IConfiguration configuration, IRabbitMQCartMessageSender messageBus, ISendEmailService emailService)
         {
             this._db = db;
             this._mapper = mapper;
@@ -220,7 +222,8 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
                 await _emailService.SendAsync(cartDto.CartHeader.Email, "Your Mango Cart Summary", MailBody(cartDto));
 
                 var queueName = _configuration.GetValue<string>("TopicAndQueueNames:EmailShoppingCartQueue") ?? "emailshoppingcart";
-                await _messageBus.PublishMessage(cartDto, queueName);
+                await _messageBus.SendMessage(cartDto, queueName);
+                //await _messageBus.PublishMessage(cartDto, queueName);
                 _response.Result = true;
             }
             catch (Exception ex)
