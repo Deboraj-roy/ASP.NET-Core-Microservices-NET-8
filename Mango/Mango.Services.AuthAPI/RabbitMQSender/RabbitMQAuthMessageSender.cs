@@ -1,4 +1,6 @@
 ﻿using RabbitMQ.Client;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace Mango.Services.AuthAPI.RabbitMQSender
 {
@@ -22,9 +24,11 @@ namespace Mango.Services.AuthAPI.RabbitMQSender
                 UserName = _username,
                 Password = _password
             };
+
             this._connection = factory.CreateConnection();
 
-            using var channel = connection.CreateModel();
+            using var channel = _connection.CreateModel();
+
 
             //channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
             //var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
