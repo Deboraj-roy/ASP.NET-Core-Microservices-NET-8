@@ -70,8 +70,9 @@ namespace Mango.Services.EmailAPI.Messaging
         private async Task HandelMessage(string email)
         {
             // Implement your email sending logic here using the _emailService
-            //return _emailService.SendEmailAsync(email);
+             _emailService.RegisterUserEmailAndLog(email).GetAwaiter().GetResult();
         }
+
 
         //dispose connection and channel when the service is stopped
         public override void Dispose()
