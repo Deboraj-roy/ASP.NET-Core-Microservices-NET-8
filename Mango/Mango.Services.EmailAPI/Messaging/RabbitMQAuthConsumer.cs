@@ -1,5 +1,6 @@
 ﻿using Mango.Services.EmailAPI.Services;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 
 namespace Mango.Services.EmailAPI.Messaging
@@ -48,7 +49,34 @@ namespace Mango.Services.EmailAPI.Messaging
             await this._channel.QueueDeclareAsync(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
 
             // TODO: Implement message consumption logic here
+
+
+            stoppingToken.ThrowIfCancellationRequested();
+
+            var consumer = new RabbitMQ.Client.Events.EventingBasicConsumer(this._channel);
+            consumer.Received += async (model, ea) =>
+            {
+                var body = ea.Body.ToArray();
+                var content = System.Text.Encoding.UTF8.GetString(body);
+                String email = JsonConvert.DeserializeObject<String>(content);
+                HandelMessage(email).GetAwaiter().GetResult();
+                _channel.BasicAck(ea.DeliveryTag, false);
+            };
         }
 
+        private async Task HandelMessage(string email)
+        {
+            // Implement your email sending logic here using the _emailService
+            //return _emailService.SendEmailAsync(email);
+        }
+
+        //dispose connection and channel when the service is stopped
+        public override void Dispose()
+        {
+            this._channel?.Close();
+            this._connection?.Close();
+            base.Dispose();
+
+        }
     }
 }
