@@ -1,4 +1,6 @@
 ﻿using RabbitMQ.Client;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace Mango.Services.AuthAPI.RabbitMQSender
 {
@@ -7,14 +9,15 @@ namespace Mango.Services.AuthAPI.RabbitMQSender
         private readonly string _hostName;
         private readonly string _username;
         private readonly string _password;
-        private IConnection _connection;
+        private IConnection? _connection; // Make _connection nullable to fix CS8618
+
         public RabbitMQAuthMessageSender()
         {
             this._hostName = "localhost";
             this._username = "guest";
             this._password = "guest";
         }
-        public void SendMessage(object message, string queueName)
+        public async Task SendMessage(object message, string queueName)
         {
             var factory = new ConnectionFactory()
             {
@@ -22,20 +25,17 @@ namespace Mango.Services.AuthAPI.RabbitMQSender
                 UserName = _username,
                 Password = _password
             };
-            this._connection = factory.CreateConnection();
 
-            using var channel = connection.CreateModel();
+            this._connection = await factory.CreateConnectionAsync();
 
-            //channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
-            //var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-            //channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: null, body: body);
+            var channel = await _connection.CreateChannelAsync();
 
-            channel.QueueDeclare(queueName);
+            await channel.QueueDeclareAsync(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
 
             var json = JsonConvert.SerializeObject(message);
             var body = Encoding.UTF8.GetBytes(json);
 
-            channel.BasicPublish(exchange: "", routingKey: queueName, body: body);
+            await channel.BasicPublishAsync(exchange: "", routingKey: queueName, body: body);
         }
     }
 }
