@@ -60,8 +60,11 @@ namespace Mango.Services.EmailAPI.Messaging
                 var content = System.Text.Encoding.UTF8.GetString(body);
                 String email = JsonConvert.DeserializeObject<String>(content);
                 HandelMessage(email).GetAwaiter().GetResult();
-                _channel.BasicAck(ea.DeliveryTag, false);
+                this._channel.BasicAck(ea.DeliveryTag, false);
             };
+
+            this._channel.BasicConsume(queue: _queueName, autoAck: false, consumer: consumer);
+            return Task.CompletedTask;
         }
 
         private async Task HandelMessage(string email)
