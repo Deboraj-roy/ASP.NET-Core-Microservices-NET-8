@@ -11,6 +11,9 @@ namespace Mango.Services.OrderAPI.RabbitMQSender
         private readonly string _username;
         private readonly string _password;
         private IConnection? _connection; // Make _connection nullable to fix CS8618
+        private const string OrderCreated_RewardsUpdateQueue = "RewardsUpdateQueue";
+        private const string OrderCreated_EmailUpdateQueue = "EmailUpdateQueue";
+
 
         public RabbitMQOrderMessageSender()
         {
@@ -29,15 +32,23 @@ namespace Mango.Services.OrderAPI.RabbitMQSender
             //this._connection = await factory.CreateConnectionAsync();
 
 
-            if (await ConnctionExists())
+            if (await ConnectionExists())
             {
                 using var channel = await this._connection.CreateChannelAsync();
-                await channel.ExchangeDeclareAsync(exchange: exchangeName, ExchangeType.Fanout, durable: false);
+                //await channel.ExchangeDeclareAsync(exchange: exchangeName, ExchangeType.Fanout, durable: false);
+                await channel.ExchangeDeclareAsync(exchange: exchangeName, ExchangeType.Direct, durable: false);
+
+                await channel.QueueDeclareAsync(OrderCreated_EmailUpdateQueue, false, false, false, null);
+                await channel.QueueDeclareAsync(OrderCreated_RewardsUpdateQueue, false, false, false, null);
+
+                await channel.QueueBindAsync(OrderCreated_EmailUpdateQueue, exchangeName, "EmailUpdate");
+                await channel.QueueBindAsync(OrderCreated_RewardsUpdateQueue, exchangeName, "RewardsUpdate");
 
                 var json = JsonConvert.SerializeObject(message);
                 var body = Encoding.UTF8.GetBytes(json);
-                //await channel.BasicPublishAsync(exchange: "", routingKey: queueName, basicProperties: null, body: body);
-                await channel.BasicPublishAsync(exchange: exchangeName, null, body: body);
+
+                await channel.BasicPublishAsync(exchange: exchangeName, routingKey: "EmailUpdate", body: body);
+                await channel.BasicPublishAsync(exchange: exchangeName, routingKey: "RewardsUpdate", body: body);
             }
         }
         private async Task CreateConnection()
@@ -59,14 +70,14 @@ namespace Mango.Services.OrderAPI.RabbitMQSender
             }
         }
 
-        private async Task<bool> ConnctionExists()
+        private async Task<bool> ConnectionExists()
         {
             if (this._connection != null)
             {
                 return true;
             }
             await CreateConnection();
-            return true;
+            return this._connection != null;
         }
     }
 }

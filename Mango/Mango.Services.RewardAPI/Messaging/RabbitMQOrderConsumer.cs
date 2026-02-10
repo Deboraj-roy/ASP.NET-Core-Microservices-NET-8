@@ -38,7 +38,7 @@ namespace Mango.Services.RewardAPI.Messaging
             await this._channel.ExchangeDeclareAsync(_queueNameApp, ExchangeType.Fanout);
             var queueDeclareOk = await this._channel.QueueDeclareAsync();
             this._queueName = queueDeclareOk.QueueName;
-            _channel.QueueBindAsync(_queueName, _queueNameApp, "");
+            await _channel.QueueBindAsync(_queueName, _queueNameApp, "");
 
             stoppingToken.ThrowIfCancellationRequested();
 
