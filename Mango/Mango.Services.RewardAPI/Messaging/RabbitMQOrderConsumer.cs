@@ -17,11 +17,15 @@ namespace Mango.Services.RewardAPI.Messaging
         private readonly string? _queueNameApp = "";
         private string? _queueName = "";
 
+        private const string OrderCreated_RewardsUpdateQueue = "RewardsUpdateQueue";
+        private string ExchangeName = "";
+
         public RabbitMQOrderConsumer(IConfiguration configuration, RewardService rewardService)
         {
             this._configuration = configuration;
             this._rewardService = rewardService;
             this._queueNameApp = this._configuration.GetValue<string>("TopicAndQueueNames:OrderCreatedTopic");
+            this.ExchangeName = this._configuration.GetValue<string>("TopicAndQueueNames:OrderCreatedTopic");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,10 +39,14 @@ namespace Mango.Services.RewardAPI.Messaging
 
             this._connection = await factory.CreateConnectionAsync();
             this._channel = await _connection.CreateChannelAsync(cancellationToken: stoppingToken);
-            await this._channel.ExchangeDeclareAsync(_queueNameApp, ExchangeType.Fanout);
-            var queueDeclareOk = await this._channel.QueueDeclareAsync();
-            this._queueName = queueDeclareOk.QueueName;
-            await _channel.QueueBindAsync(_queueName, _queueNameApp, "");
+            //await this._channel.ExchangeDeclareAsync(_queueNameApp, ExchangeType.Fanout);
+            await this._channel.ExchangeDeclareAsync(ExchangeName, ExchangeType.Direct);
+            //var queueDeclareOk = await this._channel.QueueDeclareAsync();
+            //this._queueName = queueDeclareOk.QueueName;
+            //await _channel.QueueBindAsync(_queueName, _queueNameApp, "");
+
+            await _channel.QueueDeclareAsync(OrderCreated_RewardsUpdateQueue, false, false, false, null);
+            await _channel.QueueBindAsync(OrderCreated_RewardsUpdateQueue, ExchangeName, "RewardsUpdate");
 
             stoppingToken.ThrowIfCancellationRequested();
 
@@ -52,7 +60,8 @@ namespace Mango.Services.RewardAPI.Messaging
                 await this._channel.BasicAckAsync(ea.DeliveryTag, false);
             };
 
-            await this._channel.BasicConsumeAsync(queue: _queueName, autoAck: false, consumer: consumer);
+            //await this._channel.BasicConsumeAsync(queue: _queueName, autoAck: false, consumer: consumer);
+            await this._channel.BasicConsumeAsync(queue: OrderCreated_RewardsUpdateQueue, autoAck: false, consumer: consumer);
 
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }
@@ -69,7 +78,7 @@ namespace Mango.Services.RewardAPI.Messaging
             {
                 await this._channel.CloseAsync();
             }
-            
+
             if (this._connection != null)
             {
                 await this._connection.CloseAsync();

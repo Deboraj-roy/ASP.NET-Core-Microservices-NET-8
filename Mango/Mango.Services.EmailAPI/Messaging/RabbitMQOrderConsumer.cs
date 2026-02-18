@@ -17,11 +17,15 @@ namespace Mango.Services.EmailAPI.Messaging
         private readonly string? _queueNameApp = "";
         private string? _queueName = "";
 
+        private const string OrderCreated_EmailUpdateQueue = "EmailUpdateQueue";
+        private string ExchangeName = "";
+
         public RabbitMQOrderConsumer(IConfiguration configuration, EmailService emailService)
         {
             this._configuration = configuration;
             this._emailService = emailService;
             this._queueNameApp = this._configuration.GetValue<string>("TopicAndQueueNames:OrderCreatedTopic");
+            this.ExchangeName = this._configuration.GetValue<string>("TopicAndQueueNames:OrderCreatedTopic");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,12 +39,16 @@ namespace Mango.Services.EmailAPI.Messaging
 
             this._connection = await factory.CreateConnectionAsync();
             this._channel = await _connection.CreateChannelAsync(cancellationToken: stoppingToken);
-            await this._channel.ExchangeDeclareAsync(_queueNameApp, ExchangeType.Fanout);
-            var queueDeclareOk = await this._channel.QueueDeclareAsync();
-            this._queueName = queueDeclareOk.QueueName;
+            await this._channel.ExchangeDeclareAsync(ExchangeName, ExchangeType.Direct);
+            //var queueDeclareOk = await this._channel.QueueDeclareAsync();
+            //this._queueName = queueDeclareOk.QueueName;
 
-            _channel.QueueBindAsync(_queueName, _queueNameApp, "");
+            //_channel.QueueBindAsync(_queueName, _queueNameApp, "");
             //_channel.QueueBindAsync(queue: this._queueName, exchange: _queueNameApp, routingKey: "");
+
+
+            await _channel.QueueDeclareAsync(OrderCreated_EmailUpdateQueue, false, false, false, null);
+            await _channel.QueueBindAsync(OrderCreated_EmailUpdateQueue, ExchangeName, "EmailUpdate");
 
             stoppingToken.ThrowIfCancellationRequested();
 
@@ -54,7 +62,7 @@ namespace Mango.Services.EmailAPI.Messaging
                 await this._channel.BasicAckAsync(ea.DeliveryTag, false);
             };
 
-            await this._channel.BasicConsumeAsync(queue: _queueName, autoAck: false, consumer: consumer);
+            await this._channel.BasicConsumeAsync(queue: OrderCreated_EmailUpdateQueue, autoAck: false, consumer: consumer);
 
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }
